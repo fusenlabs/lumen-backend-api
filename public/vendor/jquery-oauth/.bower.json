@@ -1,0 +1,41 @@
+{
+  "name": "jquery-oauth",
+  "version": "2.1.3",
+  "homepage": "https://github.com/esbenp/jquery-oauth",
+  "authors": [
+    "Esben Petersen <esbenspetersen@gmail.com>"
+  ],
+  "description": "A $.ajax wrapper for OAuth 2 access and refresh token management for use in a SPA",
+  "main": "src/jquery.oauth.js",
+  "keywords": [
+    "oauth",
+    "ajax",
+    "jquery"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "public/vendor",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "requirejs": "~2.1.16"
+  },
+  "dependencies": {
+    "jquery": ">=1.5",
+    "store-js": "~1.3.17"
+  },
+  "_release": "2.1.3",
+  "_resolution": {
+    "type": "version",
+    "tag": "2.1.3",
+    "commit": "0343157331ef5e871ddfe6d47c059d6c21eb2b5f"
+  },
+  "_source": "git://github.com/esbenp/jquery-oauth.git",
+  "_target": "~2.1.3",
+  "_originalSource": "jquery-oauth",
+  "_direct": true
+}

@@ -76,7 +76,16 @@ $app->routeMiddleware([
     'check-authorization-params' => Optimus\OAuth2Server\Middleware\CheckAuthCodeRequestMiddleware::class,
     'csrf' => Laravel\Lumen\Http\Middleware\VerifyCsrfToken::class,
     'oauth' => Optimus\OAuth2Server\Middleware\OAuthMiddleware::class,
-    'oauth-owner' => Optimus\OAuth2Server\Middleware\OAuthOwnerMiddleware::class
+    'oauth-owner' => Optimus\OAuth2Server\Middleware\OAuthOwnerMiddleware::class,
+    'authorization_code' => Optimus\OAuth2Server\Middleware\CheckAuthCodeRequestMiddleware::class
+]);
+
+$app->middleware([
+    // Illuminate\Cookie\Middleware\EncryptCookies::class,
+    // Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+    // Illuminate\Session\Middleware\StartSession::class,
+    // Illuminate\View\Middleware\ShareErrorsFromSession::class,
+    // Laravel\Lumen\Http\Middleware\VerifyCsrfToken::class
 ]);
 
 /*
@@ -95,6 +104,7 @@ $app->routeMiddleware([
 // $app->register(App\Providers\EventServiceProvider::class);
 $app->register(LucaDegasperi\OAuth2Server\Storage\FluentStorageServiceProvider::class);
 $app->register(Optimus\OAuth2Server\OAuth2ServerServiceProvider::class);
+$app->register(Laravel\Socialite\SocialiteServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
@@ -110,6 +120,25 @@ $app->register(Optimus\OAuth2Server\OAuth2ServerServiceProvider::class);
 $app->group(['namespace' => 'App\Http\Controllers'], function ($app) {
     require __DIR__.'/../app/Http/routes.php';
 });
+
+/*
+|--------------------------------------------------------------------------
+| Define Aliases
+|--------------------------------------------------------------------------
+|
+| I think this is needed since Lumen has Facades turned off for
+| performance reasons.
+|
+*/
+
+class_alias(Laravel\Socialite\Facades\Socialite::class, 'Socialite');
+
+/*
+|--------------------------------------------------------------------------
+| Boot Up configs
+|--------------------------------------------------------------------------
+|
+*/
 
 $app->configure('app');
 $app->configure('secrets');

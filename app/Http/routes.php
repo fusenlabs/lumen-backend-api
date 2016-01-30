@@ -29,6 +29,30 @@ $app->post('refresh-token', function() use($app) {
 });
 
 $app->post('oauth/access-token', function() use($app) {
+    $requestDomain = isset($_SERVER['HTTP_HOST'])
+        ? $_SERVER['HTTP_HOST']
+        : $_SERVER['SERVER_NAME'];
+
+    $validURls = $app->make('db')
+        ->table('oauth_client_reference_http')
+        ->select('accept_from_url')
+        ->where('client_id', '=', $app->make('request')->get('client_id'))
+        ->get();
+
+    $checkUrls = count($validURls) !== 0;
+    if ($checkUrls) {
+        $hasMatch = array_reduce($validURls, function($carry, $item) use ($requestDomain)
+        {
+            $pattern = '/'.str_replace('*.', '^([a-z0-9]+[.])*', $item->accept_from_url).'$/';
+            $match = preg_grep($pattern, [$requestDomain]);
+            return $carry || $match;
+        });
+
+        if (!$hasMatch) {
+            throw new App\Exceptions\InvalidClientReferenceException();
+        }
+    }
+
     return response()->json($app->make('oauth2-server.authorizer')->issueAccessToken());
 });
 
@@ -41,3 +65,17 @@ $app->group(['prefix' => 'api', 'middleware' => 'oauth'], function($app)
         ]);
     });
 });
+
+
+$app->group(['prefix' => 'user', 'middleware' => 'oauth'], function () use ($app)
+{
+    // user/register/{service}
+    $app->post('register/facebook', 'Auth\FacebookController@verifyCredentials');
+
+
+    // user/{id}/password_reset
+    // user/{id}/password_change
+    // user/{id}/deactivate
+    // user/{id}/profile
+});
+// me/

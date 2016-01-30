@@ -32,6 +32,33 @@ Client.prototype._login = function _login() {
     });
 }
 
+Client.prototype._login_client_token = function _login() {
+    var self = this;
+    var data = {
+        client_id: 1,
+        client_secret: 'gKYG75sw',
+        grant_type: 'client_credentials'
+    };
+    $.ajax({
+        url: "/oauth/access-token",
+        method: "POST",
+        data: data,
+        //contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+        statusCode: {
+            200: function(response) {
+                if (response.access_token === undefined) {
+                    alert('Something went wrong');
+                } else {
+                    self.authClient.login(response.access_token, response.expires_in);
+                }
+            },
+            401: function() {
+                alert('Login failed');
+            }
+        }
+    });
+}
+
 Client.prototype._logout = function _logout() {
     this.authClient.logout();
 }
@@ -77,6 +104,7 @@ Client.prototype._setupEventHandlers = function _setupEventHandlers() {
     $("#login").click(this._login.bind(this));
     $("#request").click(this._request.bind(this));
     $("#logout").click(this._logout.bind(this));
+    $("#login_client_token").click(this._login_client_token.bind(this));
 }
 
 $(document).ready(function() {

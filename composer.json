@@ -9,7 +9,8 @@
         "laravel/lumen-framework": "5.1.*",
         "vlucas/phpdotenv": "~2.2",
         "optimus/oauth2-server-lumen": "0.1.*",
-        "guzzlehttp/guzzle": "^6.1"
+        "guzzlehttp/guzzle": "^6.1",
+        "laravel/socialite": "^2.0"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

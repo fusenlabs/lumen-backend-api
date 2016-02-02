@@ -23,7 +23,7 @@ $app = new Laravel\Lumen\Application(
     realpath(__DIR__.'/../')
 );
 
-// $app->withFacades();
+$app->withFacades();
 
 // $app->withEloquent();
 
@@ -81,10 +81,10 @@ $app->routeMiddleware([
 ]);
 
 $app->middleware([
-    // Illuminate\Cookie\Middleware\EncryptCookies::class,
-    // Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-    // Illuminate\Session\Middleware\StartSession::class,
-    // Illuminate\View\Middleware\ShareErrorsFromSession::class,
+    'Illuminate\Cookie\Middleware\EncryptCookies',
+    'Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse',
+    'Illuminate\Session\Middleware\StartSession',
+    'Illuminate\View\Middleware\ShareErrorsFromSession'
     // Laravel\Lumen\Http\Middleware\VerifyCsrfToken::class
 ]);
 
@@ -104,7 +104,6 @@ $app->middleware([
 // $app->register(App\Providers\EventServiceProvider::class);
 $app->register(LucaDegasperi\OAuth2Server\Storage\FluentStorageServiceProvider::class);
 $app->register(Optimus\OAuth2Server\OAuth2ServerServiceProvider::class);
-$app->register(Laravel\Socialite\SocialiteServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
@@ -131,7 +130,6 @@ $app->group(['namespace' => 'App\Http\Controllers'], function ($app) {
 |
 */
 
-class_alias(Laravel\Socialite\Facades\Socialite::class, 'Socialite');
 
 /*
 |--------------------------------------------------------------------------
@@ -139,8 +137,8 @@ class_alias(Laravel\Socialite\Facades\Socialite::class, 'Socialite');
 |--------------------------------------------------------------------------
 |
 */
-
 $app->configure('app');
 $app->configure('secrets');
+$app->configure('services');
 
 return $app;

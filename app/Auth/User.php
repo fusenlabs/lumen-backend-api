@@ -21,11 +21,23 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 *
 * @var array
 */
-    protected $fillable = ['name', 'email', 'password'];
+    protected $fillable = ['name', 'email', 'password', 'facebook_id'];
     /**
 * The attributes excluded from the model's JSON form.
 *
 * @var array
 */
     protected $hidden = ['password', 'remember_token'];
+
+    /**
+     * Resolve a connection instance.
+     *
+     * @param  string|null  $connection
+     * @return \Illuminate\Database\Connection
+     */
+    public static function resolveConnection($connection = null)
+    {
+        return app()->make('db')->connection();
+    }
+    
 }

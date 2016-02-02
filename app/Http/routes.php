@@ -24,24 +24,37 @@ $app->post('login', function() use($app) {
     return $app->make('App\Auth\Proxy')->attemptLogin($credentials);
 });
 
+$app->post('register/facebook', function() use($app) {
+    $credentials = $app->make('App\Auth\FacebookController')->verifyCredentials(app()->make('request'));
+    //return response()->json($app->make('oauth2-server.authorizer')->issueAccessToken());
+    return $app->make('App\Auth\Proxy')->attemptLogin($credentials);
+});
+
+$app->post('login/facebook', function() use($app) {
+    // user/register/{service}
+    $credentials = app()->make('request')->input("credentials");
+    // = []$app->make('Auth\FacebookController')->verifyCredentials();
+    return $app->make('App\Auth\Proxy')->attemptLogin($credentials);
+});
+
 $app->post('refresh-token', function() use($app) {
     return $app->make('App\Auth\Proxy')->attemptRefresh();
 });
 
 $app->post('oauth/access-token', function() use($app) {
-    $requestDomain = isset($_SERVER['HTTP_HOST'])
+    /*$requestDomain = isset($_SERVER['HTTP_HOST'])
         ? $_SERVER['HTTP_HOST']
         : $_SERVER['SERVER_NAME'];
 
-    $validURls = $app->make('db')
+    $validUrls = $app->make('db')
         ->table('oauth_client_reference_http')
         ->select('accept_from_url')
         ->where('client_id', '=', $app->make('request')->get('client_id'))
         ->get();
 
-    $checkUrls = count($validURls) !== 0;
+    $checkUrls = count($validUrls) !== 0;
     if ($checkUrls) {
-        $hasMatch = array_reduce($validURls, function($carry, $item) use ($requestDomain)
+        $hasMatch = array_reduce($validUrls, function($carry, $item) use ($requestDomain)
         {
             $pattern = '/'.str_replace('*.', '^([a-z0-9]+[.])*', $item->accept_from_url).'$/';
             $match = preg_grep($pattern, [$requestDomain]);
@@ -51,7 +64,7 @@ $app->post('oauth/access-token', function() use($app) {
         if (!$hasMatch) {
             throw new App\Exceptions\InvalidClientReferenceException();
         }
-    }
+    }*/
 
     return response()->json($app->make('oauth2-server.authorizer')->issueAccessToken());
 });
@@ -59,9 +72,14 @@ $app->post('oauth/access-token', function() use($app) {
 $app->group(['prefix' => 'api', 'middleware' => 'oauth'], function($app)
 {
     $app->get('resource', function() {
+        $authManager = app()['oauth2-server.authorizer'];
+        $userId = $authManager->getResourceOwnerId();
+        //build user relative to resource owner id
+        $user = App\Auth\User::where('id', $userId)->first();
+
         return response()->json([
-            "id" => 1,
-            "name" => "A resource"
+            "id" => $user->id,
+            "name" => $user->name
         ]);
     });
 });
@@ -69,8 +87,6 @@ $app->group(['prefix' => 'api', 'middleware' => 'oauth'], function($app)
 
 $app->group(['prefix' => 'user', 'middleware' => 'oauth'], function () use ($app)
 {
-    // user/register/{service}
-    $app->post('register/facebook', 'Auth\FacebookController@verifyCredentials');
 
 
     // user/{id}/password_reset

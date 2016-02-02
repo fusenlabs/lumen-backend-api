@@ -32,28 +32,25 @@ Client.prototype._login = function _login() {
     });
 }
 
-Client.prototype._login_client_token = function _login() {
+Client.prototype._login_fb_client = function _login() {
     var self = this;
-    var data = {
-        client_id: 1,
-        client_secret: 'gKYG75sw',
-        grant_type: 'client_credentials'
-    };
+    var data = window.flashFBCredentials;
+    //window.flashFBCredentials = {};
     $.ajax({
-        url: "/oauth/access-token",
+        url: "/register/facebook",
         method: "POST",
         data: data,
         //contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
         statusCode: {
             200: function(response) {
-                if (response.access_token === undefined) {
+                if (response.accessToken === undefined) {
                     alert('Something went wrong');
                 } else {
-                    self.authClient.login(response.access_token, response.expires_in);
+                    self.authClient.login(response.accessToken, response.accessTokenExpiration);
                 }
             },
             401: function() {
-                alert('Login failed');
+                alert('Client authorization failed');
             }
         }
     });
@@ -104,7 +101,7 @@ Client.prototype._setupEventHandlers = function _setupEventHandlers() {
     $("#login").click(this._login.bind(this));
     $("#request").click(this._request.bind(this));
     $("#logout").click(this._logout.bind(this));
-    $("#login_client_token").click(this._login_client_token.bind(this));
+    $("#login_fb_client").click(this._login_fb_client.bind(this));
 }
 
 $(document).ready(function() {

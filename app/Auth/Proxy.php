@@ -11,6 +11,11 @@ class Proxy {
         return $this->proxy('password', $credentials);
     }
 
+    public function attemptAuthorization($credentials)
+    {
+        return $this->proxy('authorization_code', $credentials);
+    }
+
     public function attemptRefresh()
     {
         $crypt = app()->make('encrypter');

@@ -23,7 +23,7 @@ $app = new Laravel\Lumen\Application(
     realpath(__DIR__.'/../')
 );
 
-$app->withFacades();
+// $app->withFacades();
 
 // $app->withEloquent();
 
@@ -65,7 +65,8 @@ $app->singleton(
 
 $app->middleware([
     LucaDegasperi\OAuth2Server\Middleware\OAuthExceptionHandlerMiddleware::class,
-    Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class
+    Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+    App\Http\Middleware\CorsMiddleware::class
 ]);
 
 // $app->routeMiddleware([

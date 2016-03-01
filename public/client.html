@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8">
     <title>Client</title>
-    <script type="text/javascript" src="/vendor/jquery/dist/jquery.min.js"></script>
-    <script type="text/javascript" src="/vendor/store-js/store.min.js"></script>
-    <script type="text/javascript" src="/vendor/jquery-oauth/dist/jquery.oauth.js"></script>
-    <script type="text/javascript" src="/js/client.js"></script>
+    <script type="text/javascript" src="vendor/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="vendor/store-js/store.min.js"></script>
+    <script type="text/javascript" src="vendor/jquery-oauth/dist/jquery.oauth.js"></script>
+    <script type="text/javascript" src="js/client.js"></script>
   </head>
   <body>
     
@@ -28,8 +28,8 @@
     if (response.status === 'connected') {
       // Logged into your app and Facebook.
       window.flashFBCredentials = {
-        access_token: response.authResponse.accessToken,
-        expires_in: response.authResponse.expiresIn
+        accessToken: response.authResponse.accessToken,
+        expiresIn: response.authResponse.expiresIn
       };
       testAPI();
 

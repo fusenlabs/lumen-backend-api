@@ -15,26 +15,20 @@ $app->get('/', function () use ($app) {
     return $app->version();
 });
 
-/*$app->get('/', function() use ($app) {
-    return view()->make('client');
-});*/
-
 $app->post('login', function() use($app) {
     $credentials = app()->make('request')->input("credentials");
-    return $app->make('App\Auth\Proxy')->attemptLogin($credentials);
-});
-
-$app->post('register/facebook', function() use($app) {
-    $credentials = $app->make('App\Auth\FacebookController')->verifyCredentials(app()->make('request'));
-    //return response()->json($app->make('oauth2-server.authorizer')->issueAccessToken());
-    return $app->make('App\Auth\Proxy')->attemptLogin($credentials);
+    $response = $app->make('App\Auth\Proxy')->attemptLogin($credentials);
+    return $response;
 });
 
 $app->post('login/facebook', function() use($app) {
-    // user/register/{service}
-    $credentials = app()->make('request')->input("credentials");
-    // = []$app->make('Auth\FacebookController')->verifyCredentials();
-    return $app->make('App\Auth\Proxy')->attemptLogin($credentials);
+    $fb = $app->make('App\Auth\FacebookController');
+    $credentials = $fb->verifyCredentials(app()->make('request'));
+    //return response()->json($app->make('oauth2-server.authorizer')->issueAccessToken());
+    $response = $app->make('App\Auth\Proxy')->attemptLogin($credentials);
+    $data = json_decode($response->content());
+    // $data->facebookUser = $fb->getLoggedUser();
+    return response()->json($data);
 });
 
 $app->post('refresh-token', function() use($app) {
@@ -65,7 +59,6 @@ $app->post('oauth/access-token', function() use($app) {
             throw new App\Exceptions\InvalidClientReferenceException();
         }
     }*/
-
     return response()->json($app->make('oauth2-server.authorizer')->issueAccessToken());
 });
 

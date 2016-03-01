@@ -1,3 +1,4 @@
+var api_path = 'http://fusenlabs.co.s192176.gridserver.com/api';
 var Client = function Client() {
     this.authClient = null;
 
@@ -9,7 +10,7 @@ Client.prototype._login = function _login() {
     var self = this;
 
     $.ajax({
-        url: "/login",
+        url: api_path + "/login",
         method: "POST",
         data: {
             credentials: {
@@ -37,9 +38,11 @@ Client.prototype._login_fb_client = function _login() {
     var data = window.flashFBCredentials;
     //window.flashFBCredentials = {};
     $.ajax({
-        url: "/register/facebook",
+        url: api_path + "/login/facebook",
         method: "POST",
         data: data,
+        crossDomain: true,
+        headers: {"Access-Control-Allow-Origin": "http://api.localhost"},
         //contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
         statusCode: {
             200: function(response) {
@@ -62,7 +65,7 @@ Client.prototype._logout = function _logout() {
 
 Client.prototype._request = function _request() {
     var resource = $.ajax({
-        url: "/api/resource", 
+        url: api_path + "/api/resource", 
         statusCode: {
             400: function() {
                 alert('Since we did not send an access token we get client error');
@@ -89,7 +92,7 @@ Client.prototype._setupAuth = function _setupAuth() {
                 alert("You are now logged out.");
             },
             tokenExpiration: function() {
-                return $.post("/refresh-token").success(function(response){
+                return $.post(api_path + "/refresh-token").success(function(response){
                     self.authClient.setAccessToken(response.accessToken, response.accessTokenExpiration);
                 });
             }

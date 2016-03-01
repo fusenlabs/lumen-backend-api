@@ -7,6 +7,7 @@ use Facebook;
 use Facebook\Authentication\AccessToken;
 
 class FacebookController extends Controller {
+    protected $currentUser = null;
     /**
     * Return user if exists; create and return if doesn't
     *
@@ -15,6 +16,7 @@ class FacebookController extends Controller {
     */
     private function findOrCreateUser(Facebook\GraphNodes\GraphUser $facebookUser)
     {
+        $this->currentUser = $facebookUser['name'];
         //var_dump(app()->make('db')->getConnection());exit;
         $authUser = User::where('facebook_id', $facebookUser['id'])->first();
         // var_dump($facebookUser['id']);exit;
@@ -31,6 +33,11 @@ class FacebookController extends Controller {
         ]);
     }
 
+    public function getLoggedUser() {
+      return $this->currentUser;
+    }
+
+
     /**
     * 
     */
@@ -46,7 +53,7 @@ class FacebookController extends Controller {
         $helper = $fb->getJavaScriptHelper();
         try {
           // $accessToken = $helper->getAccessToken();
-          $accessToken = new AccessToken($request->input('access_token'), $request->input('expires_in'));
+          $accessToken = new AccessToken($request->input('accessToken'), $request->input('expiresIn'));
         } catch(Facebook\Exceptions\FacebookResponseException $e) {
           // When Graph returns an error
           echo 'Graph returned an error: ' . $e->getMessage();

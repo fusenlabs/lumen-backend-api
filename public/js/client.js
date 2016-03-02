@@ -1,4 +1,5 @@
 var api_path = 'http://fusenlabs.co.s192176.gridserver.com/api';
+var api_path = '';
 var Client = function Client() {
     this.authClient = null;
 
@@ -100,11 +101,61 @@ Client.prototype._setupAuth = function _setupAuth() {
     });
 }
 
+Client.prototype._saveScore = function _saveScore() {
+    var userId = $("#userId").val();
+    var genreId = $("#genreId").val();
+    var score = $("#score").val();
+    /*console.log(userId);
+    console.log(genreId);
+    console.log(score);*/
+    var resource = $.ajax({
+        url: api_path + "/api/score", 
+        method: "POST",
+        data: {genre: genreId, points: score, friends: '13'},
+        crossDomain: true,
+        headers: {"Access-Control-Allow-Origin": "http://api.localhost"},
+        statusCode: {
+            400: function() {
+                alert('Since we did not send an access token we get client error');
+            },
+            401: function() {
+                alert('You are not authenticated, if a refresh token is present will attempt to refresh access token');
+            }
+        }
+    })
+    .done(function(data) {
+        alert(JSON.stringify(data));
+    });
+}
+
+Client.prototype._getLeaderboard = function _getLeaderboard() {
+    var genreId = $("#genreId").val();
+    var resource = $.ajax({
+        url: api_path + "/api/score/" + genreId,
+        data: {friends: '13'},
+        crossDomain: true,
+        headers: {"Access-Control-Allow-Origin": "http://api.localhost"},
+        statusCode: {
+            400: function() {
+                alert('Since we did not send an access token we get client error');
+            },
+            401: function() {
+                alert('You are not authenticated, if a refresh token is present will attempt to refresh access token');
+            }
+        }
+    })
+    .done(function(data) {
+        alert(JSON.stringify(data));
+    });
+}
+
 Client.prototype._setupEventHandlers = function _setupEventHandlers() {
     $("#login").click(this._login.bind(this));
     $("#request").click(this._request.bind(this));
     $("#logout").click(this._logout.bind(this));
     $("#login_fb_client").click(this._login_fb_client.bind(this));
+    $("#save_score").click(this._saveScore.bind(this));
+    $("#leaderboard").click(this._getLeaderboard.bind(this));
 }
 
 $(document).ready(function() {

@@ -64,6 +64,42 @@ $app->post('oauth/access-token', function() use($app) {
 
 $app->group(['prefix' => 'api', 'middleware' => 'oauth'], function($app)
 {
+    $app->post('score', function() {
+        $authManager = app()['oauth2-server.authorizer'];
+        $userId = $authManager->getResourceOwnerId();
+
+        $rq = app()->make('request');
+        $genre = base64_decode($rq->get('genre'));
+        $points = $rq->get('points');
+        $friendsList = $rq->get('friends');
+        $ids = $friendsList != '' ? $friendsList . ',' . $userId : $userId;
+
+        $score = app()->make('App\Http\Controllers\ScoreController');
+        $pos = $score->saveScore(
+            $userId,
+            $genre,
+            $points,
+            $ids
+        );
+        return response()->json([
+            "pos" => $pos,
+        ]);
+    });
+
+    $app->get('score/{genreId}', function($genreId) {
+        $authManager = app()['oauth2-server.authorizer'];
+        $userId = $authManager->getResourceOwnerId();
+
+        $rq = app()->make('request');
+        $genre = base64_decode($genreId);
+        $friendsList = app()->make('request')->get('friends');
+        $score = app()->make('App\Http\Controllers\ScoreController');
+        $ids = $friendsList != '' ? $friendsList . ',' . $userId : $userId;
+        return response()->json([
+            "leaderboard" => $score->getLeaderboard($genre, $ids),
+        ]);
+    });
+
     $app->get('resource', function() {
         $authManager = app()['oauth2-server.authorizer'];
         $userId = $authManager->getResourceOwnerId();

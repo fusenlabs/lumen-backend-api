@@ -109,9 +109,9 @@ Client.prototype._saveScore = function _saveScore() {
     console.log(genreId);
     console.log(score);*/
     var resource = $.ajax({
-        url: api_path + "/api/score", 
+        url: api_path + "/api/score/" + genreId,
         method: "POST",
-        data: {genre: genreId, points: score, friends: '13'},
+        data: {points: score, friends: '13'},
         crossDomain: true,
         headers: {"Access-Control-Allow-Origin": "http://api.localhost"},
         statusCode: {
@@ -132,7 +132,28 @@ Client.prototype._getLeaderboard = function _getLeaderboard() {
     var genreId = $("#genreId").val();
     var resource = $.ajax({
         url: api_path + "/api/score/" + genreId,
-        data: {friends: '13'},
+        crossDomain: true,
+        headers: {"Access-Control-Allow-Origin": "http://api.localhost"},
+        statusCode: {
+            400: function() {
+                alert('Since we did not send an access token we get client error');
+            },
+            401: function() {
+                alert('You are not authenticated, if a refresh token is present will attempt to refresh access token');
+            }
+        }
+    })
+    .done(function(data) {
+        alert(JSON.stringify(data));
+    });
+}
+
+Client.prototype._setFriends = function _setFriends() {
+    var friends_ids = $('#friends_ids').val();
+    var resource = $.ajax({
+        url: api_path + "/api/friends",
+        data: { ids: friends_ids },
+        method: "POST",
         crossDomain: true,
         headers: {"Access-Control-Allow-Origin": "http://api.localhost"},
         statusCode: {
@@ -156,6 +177,7 @@ Client.prototype._setupEventHandlers = function _setupEventHandlers() {
     $("#login_fb_client").click(this._login_fb_client.bind(this));
     $("#save_score").click(this._saveScore.bind(this));
     $("#leaderboard").click(this._getLeaderboard.bind(this));
+    $("#friends").click(this._setFriends.bind(this));
 }
 
 $(document).ready(function() {

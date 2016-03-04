@@ -20,7 +20,7 @@ class ScoreController extends Controller
         $sentence = "SELECT s.`user_id`, MAX(s.`points`),
         (
             SELECT COUNT(*)+1 FROM (
-                SELECT MAX(s3.`points`) as `points`, s3.`genre`, s3.`user_id` FROM `scores` as s3 WHERE s3.`genre` = ? AND s3.`user_id` IN ($friendsList) GROUP BY s3.`user_id` ORDER BY s3.`points` DESC
+                SELECT MAX(s3.`points`) as `points`, s3.`genre`, s3.`user_id`, u3.`facebook_id` FROM `scores` as s3 LEFT JOIN users as u3 ON u3.id = s3.user_id WHERE s3.`genre` = ? AND u3.`facebook_id` IN ($friendsList) GROUP BY s3.`user_id` ORDER BY s3.`points` DESC
             ) as s2
             WHERE s2.`points` > (SELECT MAX(s4.`points`) FROM `scores` as s4 WHERE s4.user_id = s.user_id AND s4.`genre` = ?)
         ) as `position`
@@ -51,13 +51,13 @@ class ScoreController extends Controller
         $sentence = "SELECT s.`user_id`, u.`name`, MAX(s.`points`) as `points`,
         (
             SELECT COUNT(*)+1 FROM (
-                SELECT MAX(s3.`points`) as `points`, s3.`genre`, s3.`user_id` FROM `scores` as s3 WHERE s3.`genre` = ?  AND s3.`user_id` IN ($friendsList) GROUP BY s3.`user_id` ORDER BY s3.`points` DESC
+                SELECT MAX(s3.`points`) as `points`, s3.`genre`, s3.`user_id`, u3.`facebook_id` FROM `scores` as s3 LEFT JOIN users as u3 ON u3.id = s3.user_id WHERE s3.`genre` = ?  AND u3.`facebook_id` IN ($friendsList) GROUP BY s3.`user_id` ORDER BY s3.`points` DESC
             ) as s2
             WHERE s2.`points` > (SELECT MAX(s4.`points`) FROM `scores` as s4 WHERE s4.user_id = s.user_id AND s4.`genre` = ?)
         ) as `position`
         FROM `scores` as s
         LEFT JOIN `users` as u ON u.`id` = s.`user_id`
-        WHERE s.`genre` = ? AND s.`user_id` IN ($friendsList)
+        WHERE s.`genre` = ? AND u.`facebook_id` IN ($friendsList)
         GROUP BY s.`user_id`
         ORDER BY `position`
         LIMIT 0,?";

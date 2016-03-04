@@ -17,11 +17,11 @@ class FacebookController extends Controller {
     private function findOrCreateUser(Facebook\GraphNodes\GraphUser $facebookUser)
     {
         $this->currentUser = $facebookUser['name'];
-        //var_dump(app()->make('db')->getConnection());exit;
+        // var_dump($facebookUser);exit;
         $authUser = User::where('facebook_id', $facebookUser['id'])->first();
-        // var_dump($facebookUser['id']);exit;
         if ($authUser){
-            return $authUser;
+          $authUser->update(['avatar' => $facebookUser['picture']['url']]);
+          return $authUser;
         }
 
         $hasher = app()->make('hash');
@@ -29,7 +29,8 @@ class FacebookController extends Controller {
             'name' => $facebookUser['name'],
             'email' => $facebookUser['email'],
             'password' => $hasher->make( app()->make('config')->get('app.pass_prefix') . $facebookUser['id'] ),
-            'facebook_id' => $facebookUser['id']
+            'facebook_id' => $facebookUser['id'],
+            'avatar' => $facebookUser['picture']['url']
         ]);
     }
 
@@ -71,7 +72,13 @@ class FacebookController extends Controller {
 
         try {
           // Returns a `Facebook\FacebookResponse` object
-          $response = $fb->get('/me?fields=id,name,email', $accessToken->getValue());
+          $response = $fb->get('/me?fields=id,name,email,picture,friends', $accessToken->getValue());
+          /*$friendsResponse = $fb->get('/me/friends', $accessToken->getValue());
+          //$result['data'];
+          foreach($friendsResponse->getGraphEdge() as $node) {
+            var_dump($node);
+          }
+          exit;*/
         } catch(Facebook\Exceptions\FacebookResponseException $e) {
           echo 'Graph returned an error: ' . $e->getMessage();
           exit;

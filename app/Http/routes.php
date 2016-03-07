@@ -80,7 +80,6 @@ $app->group(['prefix' => 'api', 'middleware' => 'oauth'], function($app)
         $user_fb_id = $user->facebook_id;
         $genre = base64_decode($genreId);
         $points = app()->make('request')->get('points');
-        // $ids = $friendsList != '' ? $friendsList . ',' . $userId : $userId;
         $ids = array_merge(array_filter(explode(',', $friendsList)), [$user_fb_id]);
 
         $score = app()->make('App\Http\Controllers\ScoreController');
@@ -99,14 +98,19 @@ $app->group(['prefix' => 'api', 'middleware' => 'oauth'], function($app)
         $authManager = app()['oauth2-server.authorizer'];
         $userId = $authManager->getResourceOwnerId();
         $user = App\Auth\User::find($userId);
+
         $friendsList = $user->facebook_friends_ids;
         $user_fb_id = $user->facebook_id;
         $genre = base64_decode($genreId);
+
         $score = app()->make('App\Http\Controllers\ScoreController');
-        // $ids = $friendsList != '' ? $friendsList . ',' . $userId : $userId;
         $ids = array_merge(array_filter(explode(',', $friendsList)), [$user_fb_id]);
+        $formattedFriendsList = "'".implode("','", $ids)."'";
+        
         return response()->json([
-            "leaderboard" => $score->getLeaderboard($genre, "'".implode("','", $ids)."'"),
+            "genreId" => $genreId,
+            "userScore" => $score->getUserPosition($genre, $userId, $formattedFriendsList),
+            "leaderboard" => $score->getLeaderboard($genre, $formattedFriendsList),
         ]);
     });
 

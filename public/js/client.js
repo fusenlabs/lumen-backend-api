@@ -1,5 +1,5 @@
-var api_path = 'http://fusenlabs.co.s192176.gridserver.com/api';
-var api_path = '';
+var api_path = 'http://fusenlabs.co.s192176.gridserver.com/imt';
+//var api_path = '';
 var Client = function Client() {
     this.authClient = null;
 
@@ -66,7 +66,9 @@ Client.prototype._logout = function _logout() {
 
 Client.prototype._request = function _request() {
     var resource = $.ajax({
-        url: api_path + "/api/resource", 
+        url: api_path + "/api/resource",
+        /*crossDomain: true,*/
+        headers: {"Access-Control-Allow-Origin": "http://api.localhost"},
         statusCode: {
             400: function() {
                 alert('Since we did not send an access token we get client error');

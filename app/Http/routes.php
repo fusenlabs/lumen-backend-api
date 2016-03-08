@@ -24,10 +24,8 @@ $app->post('login', function() use($app) {
 $app->post('login/facebook', function() use($app) {
     $fb = $app->make('App\Auth\FacebookController');
     $credentials = $fb->verifyCredentials(app()->make('request'));
-    //return response()->json($app->make('oauth2-server.authorizer')->issueAccessToken());
     $response = $app->make('App\Auth\Proxy')->attemptLogin($credentials);
     $data = json_decode($response->content());
-    // $data->facebookUser = $fb->getLoggedUser();
     return response()->json($data);
 });
 
@@ -64,11 +62,63 @@ $app->post('oauth/access-token', function() use($app) {
 
 $app->group(['prefix' => 'api', 'middleware' => 'oauth'], function($app)
 {
+    $app->post('friends', function() {
+        $authManager = app()['oauth2-server.authorizer'];
+        $userId = $authManager->getResourceOwnerId();
+        $friendsIds = app()->make('request')->get('ids');
+        $affectedRows = App\Auth\User::where('id', '=', $userId)->update(['facebook_friends_ids' => $friendsIds]);
+        return response()->json([
+            "result" => $affectedRows
+        ]);
+    });
+
+    $app->post('score/{genreId}', function($genreId) {
+        $authManager = app()['oauth2-server.authorizer'];
+        $userId = $authManager->getResourceOwnerId();
+        $user = App\Auth\User::find($userId);
+        $friendsList = $user->facebook_friends_ids;
+        $user_fb_id = $user->facebook_id;
+        $genre = base64_decode($genreId);
+        $points = app()->make('request')->get('points');
+        $ids = array_merge(array_filter(explode(',', $friendsList)), [$user_fb_id]);
+
+        $score = app()->make('App\Http\Controllers\ScoreController');
+        $pos = $score->saveScore(
+            $userId,
+            $genre,
+            $points,
+            "'".implode("','", $ids)."'"
+        );
+        return response()->json([
+            "pos" => $pos,
+        ]);
+    });
+
+    $app->get('score/{genreId}', function($genreId) {
+        $authManager = app()['oauth2-server.authorizer'];
+        $userId = $authManager->getResourceOwnerId();
+        $user = App\Auth\User::find($userId);
+
+        $friendsList = $user->facebook_friends_ids;
+        $user_fb_id = $user->facebook_id;
+        $genre = base64_decode($genreId);
+
+        $score = app()->make('App\Http\Controllers\ScoreController');
+        $ids = array_merge(array_filter(explode(',', $friendsList)), [$user_fb_id]);
+        $formattedFriendsList = "'".implode("','", $ids)."'";
+        
+        return response()->json([
+            "genreId" => $genreId,
+            "userScore" => $score->getUserPosition($genre, $userId, $formattedFriendsList),
+            "leaderboard" => $score->getLeaderboard($genre, $formattedFriendsList),
+        ]);
+    });
+
     $app->get('resource', function() {
         $authManager = app()['oauth2-server.authorizer'];
         $userId = $authManager->getResourceOwnerId();
         //build user relative to resource owner id
-        $user = App\Auth\User::where('id', $userId)->first();
+        $user = App\Auth\User::find($userId);
 
         return response()->json([
             "id" => $user->id,

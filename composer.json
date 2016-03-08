@@ -10,7 +10,8 @@
         "vlucas/phpdotenv": "~2.2",
         "optimus/oauth2-server-lumen": "0.1.*",
         "guzzlehttp/guzzle": "^6.1",
-        "facebook/php-sdk-v4": "^5.1"
+        "facebook/php-sdk-v4": "^5.1",
+        "vluzrmos/tinker": "^1.1"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
